@@ -1,0 +1,55 @@
+name: Automação Idempotente de Issues
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  sync-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Cadastrar Issues Padrão (Idempotente)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          create_issue_if_not_exists() {
+            local title="$1"
+            local body="$2"
+            local labels="$3"
+
+            # Consulta idempotente usando GitHub CLI
+            local existing_issue
+            existing_issue=$(gh issue list --repo "${{ github.repository }}" --search "\"$title\" in:title" --json number -q '.[0].number')
+
+            if [ -n "$existing_issue" ]; then
+              echo "Issue já existe: [#$existing_issue] $title (pulando criação)"
+            else
+              echo "Criando issue: $title"
+              gh issue create --repo "${{ github.repository }}" \
+                --title "$title" \
+                --body "$body" \
+                --label "$labels"
+            fi
+          }
+
+          # -------------------------------------------------------------
+          # Issues Iniciais de Setup e Melhorias
+          # -------------------------------------------------------------
+          create_issue_if_not_exists \
+            "[INFRA] Configurar Proxy Reverso com SSL (HTTPS/WSS) para o Excalidraw" \
+            "### Descrição\nConfigurar Nginx, Caddy ou Traefik com suporte a SSL para permitir o uso seguro da API de Clipboard e colaboração em tempo real.\n\n### Critérios de Aceite\n- [ ] Proxy reverso roteando porta 8080 (Web) e 8081 (WebSocket)\n- [ ] Certificado SSL ativo\n- [ ] Documentação atualizada em docs/ajuda_infra.md" \
+            "enhancement"
+
+          create_issue_if_not_exists \
+            "[DOCS] Documentar integração de bibliotecas de diagramas customizados" \
+            "### Descrição\nAdicionar guia para carregar e salvar bibliotecas customizadas (.excalidrawlib) no Excalidraw.\n\n### Critérios de Aceite\n- [ ] Criar pasta prompts/ e guias de bibliotecas\n- [ ] Atualizar README.md com links" \
+            "documentation"
