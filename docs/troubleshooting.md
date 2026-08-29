@@ -11,9 +11,9 @@ Este documento registra soluções para incidentes, comportamentos inesperados e
 
 | Problema | Causa Provável | Solução |
 | :--- | :--- | :--- |
-| **Erro ao conectar à sala colaborativa (WebSocket)** | Variável `WS_SERVER_URL` incorreta ou bloqueio de proxy na porta `8081`. | Verifique se `infra/.env` aponta para o endereço alcançável pelo navegador. Se houver proxy reverso, certifique-se de repassar os headers `Upgrade` e `Connection: Upgrade`. |
+| **Colisão de porta `8080` com `proxy-manager` ou `8081` com `moodle`** | Serviços corporativos de infraestrutura pré-existentes na máquina host ocupando as portas 8080/8081. | Portas padrão da stack mapeadas para `8092` (Web) e `8093` (Room). Em caso de novo conflito, customize `EXCALIDRAW_PORT` e `EXCALIDRAW_ROOM_PORT` no `infra/.env`. |
+| **Erro ao conectar à sala colaborativa (WebSocket)** | Variável `WS_SERVER_URL` incorreta ou bloqueio de proxy na porta `8093`. | Verifique se `infra/.env` aponta para o endereço alcançável pelo navegador. Se houver proxy reverso, certifique-se de repassar os headers `Upgrade` e `Connection: Upgrade`. |
 | **Recursos de Copiar/Colar (Clipboard) desabilitados no navegador** | Acesso via IP sem certificado SSL/HTTPS. | O navegador bloqueia a API `navigator.clipboard` fora de `localhost` ou `https://`. Use um túnel seguro ou configure SSL com Caddy/Nginx. |
-| **Porta 8080 ou 8081 já em uso no host** | Conflito com outro serviço ou container Docker em execução. | Altere `EXCALIDRAW_PORT` ou `EXCALIDRAW_ROOM_PORT` no arquivo `infra/.env` para portas livres (ex: `8090` e `8091`). |
 | **Container `excalidraw-room` reiniciando em loop** | Falha de inicialização de porta ou variável de ambiente com sintaxe inválida. | Execute `docker compose -f infra/docker-compose.yml logs excalidraw-room` para analisar o traceback do Node.js. |
 
 ---
@@ -23,7 +23,7 @@ Este documento registra soluções para incidentes, comportamentos inesperados e
 ### 1. Testar Conectividade com o Servidor Room
 Para validar se o backend de colaboração está saudável, execute:
 ```bash
-curl -I http://localhost:8081/health
+curl -I http://localhost:8093/
 ```
 Resposta esperada: `HTTP/1.1 200 OK`
 

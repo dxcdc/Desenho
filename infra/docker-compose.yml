@@ -7,12 +7,12 @@ services:
     container_name: excalidraw-web
     restart: unless-stopped
     ports:
-      - "${EXCALIDRAW_PORT:-8080}:80"
+      - "${EXCALIDRAW_PORT:-8092}:80"
     environment:
       - NODE_ENV=production
-      - BACKEND_V2_GET_URL=${EXCALIDRAW_ROOM_HTTP_URL:-http://localhost:8081}
-      - BACKEND_V2_POST_URL=${EXCALIDRAW_ROOM_HTTP_URL:-http://localhost:8081}
-      - WS_SERVER_URL=${EXCALIDRAW_ROOM_WS_URL:-ws://localhost:8081}
+      - BACKEND_V2_GET_URL=${EXCALIDRAW_ROOM_HTTP_URL:-http://localhost:8093}
+      - BACKEND_V2_POST_URL=${EXCALIDRAW_ROOM_HTTP_URL:-http://localhost:8093}
+      - WS_SERVER_URL=${EXCALIDRAW_ROOM_WS_URL:-ws://localhost:8093}
     networks:
       - excalidraw-net
     healthcheck:
@@ -29,14 +29,14 @@ services:
     container_name: excalidraw-room
     restart: unless-stopped
     ports:
-      - "${EXCALIDRAW_ROOM_PORT:-8081}:80"
+      - "${EXCALIDRAW_ROOM_PORT:-8093}:80"
     environment:
       - NODE_ENV=production
       - PORT=80
     networks:
       - excalidraw-net
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://localhost:80/health || exit 1"]
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:80/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3

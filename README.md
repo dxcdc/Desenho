@@ -32,15 +32,15 @@ flowchart TD
 
     subgraph Infra["🐳 Stack Docker (infra/docker-compose.yml)"]
         direction TB
-        WEB["🖥️ excalidraw-web<br/>(Porta :8080)<br/>Interface Web SPA"]
-        ROOM["⚡ excalidraw-room<br/>(Porta :8081)<br/>Servidor WebSocket & Storage"]
+        WEB["🖥️ excalidraw-web<br/>(Porta :8092)<br/>Interface Web SPA"]
+        ROOM["⚡ excalidraw-room<br/>(Porta :8093)<br/>Servidor WebSocket & Storage"]
     end
 
-    U1 -- "HTTP :8080 (Carrega UI)" --> WEB
-    U2 -- "HTTP :8080 (Carrega UI)" --> WEB
+    U1 -- "HTTP :8092 (Carrega UI)" --> WEB
+    U2 -- "HTTP :8092 (Carrega UI)" --> WEB
 
-    U1 <== "WSS / WebSocket :8081<br/>(Criptografia E2EE)" ==> ROOM
-    U2 <== "WSS / WebSocket :8081<br/>(Sincronização em Tempo Real)" ==> ROOM
+    U1 <== "WSS / WebSocket :8093<br/>(Criptografia E2EE)" ==> ROOM
+    U2 <== "WSS / WebSocket :8093<br/>(Sincronização em Tempo Real)" ==> ROOM
 
     style WEB fill:#6965DB,stroke:#333,stroke-width:2px,color:#fff
     style ROOM fill:#009688,stroke:#333,stroke-width:2px,color:#fff
@@ -58,7 +58,7 @@ flowchart TD
 
 ### 1. Clonar e Acessar o Repositório
 ```bash
-git clone git@github.com:dxcdc/Desenho.git
+git clone git@github-dxcdc:dxcdc/Desenho.git
 cd Desenho
 ```
 
@@ -73,8 +73,8 @@ docker compose -f infra/docker-compose.yml up -d
 ```
 
 ### 4. Acessar a Aplicação
-- **Frontend Web**: [http://localhost:8080](http://localhost:8080)
-- **Servidor de Colaboração (Healthcheck)**: [http://localhost:8081/health](http://localhost:8081/health)
+- **Frontend Web**: [http://localhost:8092](http://localhost:8092)
+- **Servidor de Colaboração (Status)**: [http://localhost:8093](http://localhost:8093)
 
 Para parar os serviços:
 ```bash
@@ -126,7 +126,8 @@ gitGraph
     commit id: "docs: diretrizes governanca"
     branch feature/infra-setup
     checkout feature/infra-setup
-    commit id: "feat: adiciona docker-compose e env"
+    commit id: "feat: docker-compose stack"
+    commit id: "feat: env template"
     checkout main
     merge feature/infra-setup id: "merge: infraestrutura pronta"
     commit id: "docs: atualiza README principal"

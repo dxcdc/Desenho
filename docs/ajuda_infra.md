@@ -8,8 +8,8 @@ Este documento detalha o funcionamento técnico da stack de infraestrutura do **
 
 | Serviço | Container | Imagem Base | Porta Externa (Padrão) | Porta Interna | Descrição |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Frontend Web** | `excalidraw-web` | `excalidraw/excalidraw:latest` | `8080/tcp` | `80/tcp` | Interface web em React SPA que serve a aplicação client-side. |
-| **Backend de Colaboração** | `excalidraw-room` | `excalidraw/excalidraw-room:latest` | `8081/tcp` | `80/tcp` | Servidor WebSocket/HTTP em Node.js para troca de mensagens e sessões colaborativas. |
+| **Frontend Web** | `excalidraw-web` | `excalidraw/excalidraw:latest` | `8092/tcp` | `80/tcp` | Interface web em React SPA que serve a aplicação client-side. |
+| **Backend de Colaboração** | `excalidraw-room` | `excalidraw/excalidraw-room:latest` | `8093/tcp` | `80/tcp` | Servidor WebSocket/HTTP em Node.js para troca de mensagens e sessões colaborativas. |
 
 ---
 
@@ -59,7 +59,7 @@ server {
     server_name desenho.suaempresa.com;
 
     location / {
-        proxy_pass http://127.0.0.1:8080;
+        proxy_pass http://127.0.0.1:8092;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -72,7 +72,7 @@ server {
     server_name desenho-room.suaempresa.com;
 
     location / {
-        proxy_pass http://127.0.0.1:8081;
+        proxy_pass http://127.0.0.1:8093;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
