@@ -1,6 +1,6 @@
 # 🛠️ Ajuda & Operação de Infraestrutura (Excalidraw)
 
-Este documento detalha o funcionamento técnico da stack de infraestrutura do **Excalidraw (Desenho)**, suas portas, topologia de rede, comandos operacionais e boas práticas de implantação em produção.
+Este documento detalha o funcionamento técnico da stack de infraestrutura do **Excalidraw (Desenho)**, suas portas, topologia de rede, comandos operacionais, injeção de bibliotecas padrão e boas práticas de implantação em produção.
 
 ---
 
@@ -8,18 +8,37 @@ Este documento detalha o funcionamento técnico da stack de infraestrutura do **
 
 | Serviço | Container | Imagem Base | Porta Externa (Padrão) | Porta Interna | Descrição |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Frontend Web** | `excalidraw-web` | `excalidraw/excalidraw:latest` | `8092/tcp` | `80/tcp` | Interface web em React SPA que serve a aplicação client-side. |
+| **Frontend Web** | `excalidraw-web` | `excalidraw-web-custom:latest` (via `infra/Dockerfile.web`) | `8092/tcp` | `80/tcp` | Interface web React SPA com injeção automática de bibliotecas no IndexedDB. |
 | **Backend de Colaboração** | `excalidraw-room` | `excalidraw/excalidraw-room:latest` | `8093/tcp` | `80/tcp` | Servidor WebSocket/HTTP em Node.js para troca de mensagens e sessões colaborativas. |
 
 ---
 
-## 2. Comandos Operacionais Frequentes
+## 2. Injeção Automática de Bibliotecas Corporativas (`.excalidrawlib`)
+
+O repositório inclui um mecanismo transparente de pré-carregamento de componentes no navegador:
+
+### Como funciona:
+1. Os pacotes `.excalidrawlib` e o `manifest.json` residem em `infra/assets/libraries/`.
+2. O `infra/Dockerfile.web` copia esses arquivos para `/usr/share/nginx/html/libraries/` e injeta a chamada do script `auto-load-libraries.js` no `index.html`.
+3. No primeiro carregamento, o script popula o **IndexedDB** (`keyval-store` / `excalidraw-library-items`) e o `localStorage`, mesclando com os itens locais do usuário sem sobrescrever criações anteriores.
+
+### Como adicionar um novo pacote `.excalidrawlib`:
+1. Salve o arquivo `.excalidrawlib` dentro de `infra/assets/libraries/` (ex: `minha-biblioteca.excalidrawlib`).
+2. Adicione a entrada correspondente no `infra/assets/libraries/manifest.json`.
+3. Reconstrua a imagem do frontend:
+   ```bash
+   docker compose -f infra/docker-compose.yml up -d --build excalidraw-web
+   ```
+
+---
+
+## 3. Comandos Operacionais Frequentes
 
 Todos os comandos abaixo devem ser executados a partir da raiz do repositório:
 
-### Subir os serviços em segundo plano:
+### Subir os serviços em segundo plano (com rebuild se necessário):
 ```bash
-docker compose -f infra/docker-compose.yml up -d
+docker compose -f infra/docker-compose.yml up -d --build
 ```
 
 ### Verificar status e integridade (Healthcheck):
@@ -44,7 +63,7 @@ docker compose -f infra/docker-compose.yml down
 
 ---
 
-## 3. Implantação em Produção com Proxy Reverso (Nginx / Caddy / Traefik)
+## 4. Implantação em Produção com Proxy Reverso (Nginx / Caddy / Traefik)
 
 Para expor o Excalidraw com SSL (HTTPS / WSS), configure um proxy reverso apontando para as portas locais.
 

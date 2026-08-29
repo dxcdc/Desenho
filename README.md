@@ -1,9 +1,10 @@
 # 🎨 Excalidraw (Desenho)
 
-> **Whiteboard virtual minimalista, colaborativo e auto-hospedado para ideação ágil e diagramação de arquitetura.**
+> **Whiteboard virtual minimalista, colaborativo e auto-hospedado com bibliotecas corporativas pré-carregadas para ideação ágil e diagramação de arquitetura.**
 
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 [![Excalidraw](https://img.shields.io/badge/Excalidraw-Self--Hosted-6965DB?logo=excalidraw&logoColor=white)](https://excalidraw.com)
+[![Libraries](https://img.shields.io/badge/Libraries-Pre--Loaded%20.excalidrawlib-orange?logo=files&logoColor=white)](#-bibliotecas-corporativas-pré-carregadas)
 [![WebSocket](https://img.shields.io/badge/Real--Time-WebSocket%20E2EE-010101?logo=socketdotio&logoColor=white)](#-colaboração-em-tempo-real--e2ee)
 [![Licença](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -19,9 +20,19 @@ Elimina o atrito e a complexidade na hora de conduzir reuniões ágeis, dinâmic
 
 ---
 
-## 🏗️ Arquitetura do Sistema
+## 📦 Bibliotecas Corporativas Pré-Carregadas (`.excalidrawlib`)
 
-O ambiente é composto por dois serviços desacoplados conteinerizados: o **Frontend Web SPA** do Excalidraw e o **Backend WebSocket Room** para transmissão de cursores, traços e estados de sala criptografados de ponta a ponta (E2EE).
+Diferente do Excalidraw padrão, este ambiente conta com injeção automática de bibliotecas no **IndexedDB** do navegador no primeiro acesso, disponibilizando imediatamente:
+
+- ☁️ **Cloud & DevOps**: AWS EC2/S3/Lambda/RDS, Kubernetes Pods/Ingress, Docker, GCP Cloud Run, Redis, Postgres.
+- 🏗️ **C4 Model**: System Context, Containers (Web, API, DB), Components e Atores.
+- ⚙️ **Arquitetura de Software**: API Gateways, Microserviços, Kafka Message Broker, RabbitMQ, Nginx, Vault.
+- 📱 **UI & Wireframing**: Botões, Campos de Formulário, Modais, Cards, Headers.
+- 📊 **Processos & Ágil**: Sticky Notes de Retrospectiva, Portões de Decisão e Eventos BPMN.
+
+---
+
+## 🏗️ Arquitetura do Sistema
 
 ```mermaid
 flowchart TD
@@ -32,18 +43,21 @@ flowchart TD
 
     subgraph Infra["🐳 Stack Docker (infra/docker-compose.yml)"]
         direction TB
-        WEB["🖥️ excalidraw-web<br/>(Porta :8092)<br/>Interface Web SPA"]
+        WEB["🖥️ excalidraw-web<br/>(Porta :8092)<br/>React SPA + Auto-Load Libs"]
         ROOM["⚡ excalidraw-room<br/>(Porta :8093)<br/>Servidor WebSocket & Storage"]
+        LIBS[("📦 Assets Estáticos<br/>infra/assets/libraries/")]
     end
 
-    U1 -- "HTTP :8092 (Carrega UI)" --> WEB
-    U2 -- "HTTP :8092 (Carrega UI)" --> WEB
+    LIBS -.->|Injeta no Build| WEB
+    U1 -- "HTTP :8092 (Carrega UI + Libs no IndexedDB)" --> WEB
+    U2 -- "HTTP :8092 (Carrega UI + Libs no IndexedDB)" --> WEB
 
     U1 <== "WSS / WebSocket :8093<br/>(Criptografia E2EE)" ==> ROOM
     U2 <== "WSS / WebSocket :8093<br/>(Sincronização em Tempo Real)" ==> ROOM
 
     style WEB fill:#6965DB,stroke:#333,stroke-width:2px,color:#fff
     style ROOM fill:#009688,stroke:#333,stroke-width:2px,color:#fff
+    style LIBS fill:#f59f00,stroke:#333,stroke-width:1px,color:#fff
     style Clientes fill:#f9f9f9,stroke:#666,stroke-width:1px
     style Infra fill:#f0f4f8,stroke:#4a5568,stroke-width:1px
 ```
@@ -67,13 +81,13 @@ cd Desenho
 cp infra/.env.example infra/.env
 ```
 
-### 3. Iniciar os Serviços
+### 3. Construir e Iniciar os Serviços
 ```bash
-docker compose -f infra/docker-compose.yml up -d
+docker compose -f infra/docker-compose.yml up -d --build
 ```
 
 ### 4. Acessar a Aplicação
-- **Frontend Web**: [http://localhost:8092](http://localhost:8092)
+- **Frontend Web com Bibliotecas**: [http://localhost:8092](http://localhost:8092)
 - **Servidor de Colaboração (Status)**: [http://localhost:8093](http://localhost:8093)
 
 Para parar os serviços:
@@ -103,14 +117,17 @@ Desenho/
 │   └── workflows/
 │       └── automatizar_issues.yml     # Workflow de automação de issues no GitHub
 ├── docs/                              # Governança, infraestrutura e sustentação
-│   ├── diretrizes_documentacao.md     # Padrões editoriais, Git Graph e ADRs
+│   ├── diretrizes_documentacao.md     # Padrões editoriais, Git Graph e ADRs (ADR-001 a 005)
 │   ├── estrategia_execucao.md         # Estratégia de branches e contribuição Git
-│   ├── ajuda_infra.md                 # Arquitetura detalhada, portas e comandos Docker
-│   ├── troubleshooting.md             # Soluções para problemas de conexão e WebSocket
+│   ├── ajuda_infra.md                 # Arquitetura detalhada, portas, Docker e gestão de bibliotecas
+│   ├── troubleshooting.md             # Soluções para problemas de conexão e portas
 │   └── prompt_ia.md                   # Contexto mestre para assistentes de IA no projeto
 ├── infra/                             # Infraestrutura e orquestração de containers
+│   ├── Dockerfile.web                 # Build customizado com injeção de bibliotecas
 │   ├── docker-compose.yml             # Manifesto de execução dos serviços Excalidraw + Room
-│   └── .env.example                   # Template de variáveis de ambiente
+│   ├── .env.example                   # Template de variáveis de ambiente
+│   └── assets/
+│       └── libraries/                 # Pacotes .excalidrawlib, manifest.json e script de auto-load
 └── prompts/                           # Prompts especializados para diagramação e arquitetura
 ```
 
@@ -123,14 +140,18 @@ Seguimos a convenção de branches e visualização gráfica via Git Graph CLI:
 ```mermaid
 gitGraph
     commit id: "Initial Commit"
-    commit id: "docs: diretrizes governanca"
+    commit id: "docs: diretrizes e README"
     branch feature/infra-setup
     checkout feature/infra-setup
     commit id: "feat: docker-compose stack"
     commit id: "feat: env template"
     checkout main
-    merge feature/infra-setup id: "merge: infraestrutura pronta"
-    commit id: "docs: atualiza README principal"
+    merge feature/infra-setup id: "merge: infraestrutura"
+    branch feature/pre-loaded-libraries
+    checkout feature/pre-loaded-libraries
+    commit id: "feat: injecao automatica de bibliotecas .excalidrawlib"
+    checkout main
+    merge feature/pre-loaded-libraries id: "merge: bibliotecas corporativas"
 ```
 
 Para visualizar o histórico no terminal:

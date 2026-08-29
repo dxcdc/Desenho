@@ -1,0 +1,13 @@
+# ==============================================================================
+# Excalidraw Web SPA com Pré-Carregamento Automático de Bibliotecas
+# ==============================================================================
+FROM excalidraw/excalidraw:latest
+
+# Copia os pacotes .excalidrawlib e o script de injeção para o Nginx
+COPY assets/libraries/ /usr/share/nginx/html/libraries/
+
+# Injeta o script auto-load-libraries.js no cabeçalho do index.html
+RUN sed -i 's|</head>|<script src="/libraries/auto-load-libraries.js" defer></script></head>|g' /usr/share/nginx/html/index.html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

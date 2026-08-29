@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0",
+  "name": "CDC Excalidraw Default Libraries",
+  "description": "Bibliotecas corporativas de arquitetura, nuvem, processos e ideação pré-carregadas",
+  "libraries": [
+    {
+      "id": "cloud-architecture",
+      "name": "Cloud & Infra (AWS / GCP / K8s / Docker)",
+      "category": "Cloud",
+      "url": "/libraries/cloud-architecture.excalidrawlib"
+    },
+    {
+      "id": "c4-model",
+      "name": "C4 Model Architecture (System, Container, Component)",
+      "category": "Architecture",
+      "url": "/libraries/c4-model.excalidrawlib"
+    },
+    {
+      "id": "software-architecture",
+      "name": "Software Architecture & Microservices (DB, Queues, Gateway)",
+      "category": "Architecture",
+      "url": "/libraries/software-architecture.excalidrawlib"
+    },
+    {
+      "id": "wireframes-ui",
+      "name": "UI & Wireframes (Buttons, Forms, Modals, Cards)",
+      "category": "UI/UX",
+      "url": "/libraries/wireframes-ui.excalidrawlib"
+    },
+    {
+      "id": "process-agile",
+      "name": "Agile & Retrospective (Sticky Notes & Flow)",
+      "category": "Agile",
+      "url": "/libraries/process-agile.excalidrawlib"
+    }
+  ]
+}

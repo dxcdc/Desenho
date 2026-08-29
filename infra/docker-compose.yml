@@ -1,9 +1,12 @@
 services:
   # -------------------------------------------------------------
-  # Excalidraw - Web Frontend UI
+  # Excalidraw - Web Frontend UI (Custom Build com Bibliotecas)
   # -------------------------------------------------------------
   excalidraw-web:
-    image: excalidraw/excalidraw:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    image: excalidraw-web-custom:latest
     container_name: excalidraw-web
     restart: unless-stopped
     ports:

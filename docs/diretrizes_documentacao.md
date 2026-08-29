@@ -132,3 +132,4 @@ Receitas/
 | **ADR-002** | 2026-07-21 | Adoção do modelo de arquivos na pasta `docs/` | Padronização de governança DevOps da empresa. | Aprovado |
 | **ADR-003** | 2026-07-24 | Automação Idempotente de Issues via GitHub Actions | Garantir o cadastro e rastreabilidade automatizada de tarefas no GitHub sem duplicações. | Aprovado |
 | **ADR-004** | 2026-07-28 | Padronização de Visualização Gráfica de Branches (`git graph` / Mermaid) | Facilitar a auditoria e entendimento visual da evolução das branches da equipe. | Aprovado |
+| **ADR-005** | 2026-08-29 | Injeção Automática de Bibliotecas Corporativas (`.excalidrawlib`) | Garantir que qualquer usuário acesse o Excalidraw com pacotes arquiteturais (Cloud, K8s, C4, UI) pré-carregados no IndexedDB. | Aprovado |
