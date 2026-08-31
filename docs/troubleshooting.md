@@ -11,6 +11,7 @@ Este documento registra soluções para incidentes, comportamentos inesperados e
 
 | Problema | Causa Provável | Solução |
 | :--- | :--- | :--- |
+| **Aplicação fora do ar (502 Bad Gateway / Connection Refused)** | Containers `excalidraw-web` e `excalidraw-room` parados ou não iniciados após manutenção/reboot na VPS. | Conectar via SSH (`ssh root@76.13.227.135`) e executar: `cd /opt/desenho/infra && docker compose --project-name desenho up -d`. |
 | **Colisão de porta `8080` com `proxy-manager` ou `8081` com `moodle`** | Serviços corporativos de infraestrutura pré-existentes na máquina host ocupando as portas 8080/8081. | Portas padrão da stack mapeadas para `8092` (Web) e `8093` (Room). Em caso de novo conflito, customize `EXCALIDRAW_PORT` e `EXCALIDRAW_ROOM_PORT` no `infra/.env`. |
 | **Erro ao conectar à sala colaborativa (WebSocket)** | Variável `WS_SERVER_URL` incorreta ou bloqueio de proxy na porta `8093`. | Verifique se `infra/.env` aponta para o endereço alcançável pelo navegador. Se houver proxy reverso, certifique-se de repassar os headers `Upgrade` e `Connection: Upgrade`. |
 | **Recursos de Copiar/Colar (Clipboard) desabilitados no navegador** | Acesso via IP sem certificado SSL/HTTPS. | O navegador bloqueia a API `navigator.clipboard` fora de `localhost` ou `https://`. Use um túnel seguro ou configure SSL com Caddy/Nginx. |
